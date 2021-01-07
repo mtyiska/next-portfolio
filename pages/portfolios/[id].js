@@ -1,39 +1,40 @@
 import React from "react";
-import axios from "axios";
+import { useLazyQuery } from "@apollo/react-hooks";
+import { GET_PORTFOLIO } from "@/apollo/queries";
 
-const fetchPortfolioById = (id) => {
-  const query = `
-    query Portfolio($id: ID) {
-      portfolio (id: $id) {
-        _id,
-        title,
-        company,
-        companyWebsite
-        location
-        jobTitle
-        description
-        startDate
-        endDate
-      }
-    }`;
-  const variables = { id };
-  return axios
-    .post("http://localhost:3000/graphql", { query, variables })
-    .then(({ data: graph }) => graph.data)
-    .then((data) => data.portfolio);
-};
+const PortfolioDetail = ({ query }) => {
+  const [portfolio, setPortfolio] = React.useState(null);
+  const [getPortfolio, { loading, data }] = useLazyQuery(GET_PORTFOLIO);
 
-const PortfolioDetail = ({ portfolio }) => {
+  React.useEffect(() => {
+    getPortfolio({ variables: { id: query.id } });
+  }, []);
+
+  if (data && !portfolio) {
+    setPortfolio(data.portfolio);
+  }
+  if (loading || !portfolio) return "Loading....";
+
+  const {
+    title,
+    jobTitle,
+    companyWebsite,
+    location,
+    startDate,
+    endDate,
+    description,
+  } = portfolio;
+
   return (
     <div className="portfolio-detail">
       <div className="container">
         <div className="jumbotron">
-          <h1 className="display-3">{portfolio.title}</h1>
-          <p className="lead">{portfolio.jobTitle}</p>
+          <h1 className="display-3">{title}</h1>
+          <p className="lead">{jobTitle}</p>
           <p>
             <a
               className="btn btn-lg btn-success"
-              href={portfolio.companyWebsite}
+              href={companyWebsite}
               role="button"
             >
               See Company
@@ -44,10 +45,10 @@ const PortfolioDetail = ({ portfolio }) => {
         <div className="row marketing">
           <div className="col-lg-6">
             <h4 className="title">Location</h4>
-            <p className="text">{portfolio.location}</p>
+            <p className="text">{location}</p>
 
             <h4 className="title">Start Date</h4>
-            <p className="text">{portfolio.startDate}</p>
+            <p className="text">{startDate}</p>
           </div>
 
           <div className="col-lg-6">
@@ -56,12 +57,12 @@ const PortfolioDetail = ({ portfolio }) => {
             <p className="text">44</p>
 
             <h4 className="title">End Date</h4>
-            <p className="text">{portfolio.endDate}</p>
+            <p className="text">{endDate}</p>
           </div>
           <div className="col-md-12">
             <hr />
             <h4 className="title">Description</h4>
-            <p>{portfolio.description}</p>
+            <p>{description}</p>
           </div>
         </div>
       </div>
@@ -70,8 +71,7 @@ const PortfolioDetail = ({ portfolio }) => {
 };
 
 PortfolioDetail.getInitialProps = async ({ query }) => {
-  const portfolio = await fetchPortfolioById(query.id);
-  return { portfolio };
+  return { query };
 };
 
 export default PortfolioDetail;
