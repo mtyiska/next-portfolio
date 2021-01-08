@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "nodemon --watch server server/index.js",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "db": "node server/fakeDb/populate.js"
   },
   "dependencies": {
     "@apollo/react-hooks": "^4.0.0",
+    "@apollo/react-ssr": "^4.0.0",
     "apollo-boost": "^0.4.9",
     "apollo-server-express": "^2.19.1",
     "axios": "^0.21.1",
@@ -16,7 +18,9 @@
     "express": "^4.17.1",
     "express-graphql": "^0.12.0",
     "graphql": "^15.4.0",
+    "mongoose": "^5.11.10",
     "next": "10.0.4",
+    "next-with-apollo": "^5.0.0",
     "node-sass": "^5.0.0",
     "react": "17.0.1",
     "react-bootstrap": "^1.0.0-beta.16",
